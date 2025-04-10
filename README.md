@@ -57,3 +57,7 @@ Ce projet a pour but de :
 ---
 
 ## **Diagramme de classe** 🧩
+## **Shéma de base de donnés** 🧩
+
+![image](https://github.com/user-attachments/assets/4c18e59a-8691-47d2-b8d8-2f019e24e4cf)
+
