@@ -58,7 +58,19 @@ Ce projet a pour but de :
 ## **Exécution des tests dans la console** 💻
 
 ![Capture d'écran 2025-04-11 131217](https://github.com/user-attachments/assets/e207f899-57cb-4d2f-9ff2-4520c56a35fc)
-![Capture d'écran 2025-04-11 131253](https://github.com/user-attachments/assets/3c1b7daf-f251-42a7-9c05-b572dfc4d324)
-![Capture d'écran 2025-04-11 131238](https://github.com/user-attachments/assets/c2507947-94c0-401c-bb45-d95924854e24)
-![Capture d'écran 2025-04-11 131305](https://github.com/user-attachments/assets/e8ae1e7c-5beb-4858-925d-23576dd16e69)
+
+---
+![Capture d'écran 2025-04-11 133431](https://github.com/user-attachments/assets/61d69fee-31aa-400c-a7f6-7867eddb0dac)
+
+
+---
+
+![Capture d'écran 2025-04-11 133445](https://github.com/user-attachments/assets/6e320d86-890b-4295-889b-22ae0089b6de)
+
+
+---
+
+![Capture d'écran 2025-04-11 133455](https://github.com/user-attachments/assets/966f187d-6a62-40ad-a51f-1ec9ad35d583)
+
+
 
