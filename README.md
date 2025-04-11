@@ -1,14 +1,5 @@
 # **Projet : Gestion des Congés d'Entreprise** 🏖️
 
-## 📌 Table des matières  
-- [Contexte](#contexte)  
-- [Problématique](#problématique)  
-- [Objectifs](#objectifs)  
-- [Technologies Utilisées](#technologies-utilisées)  
-- [Diagramme de classe](#diagramme-de-classe)  
-- [Modèle conceptuel de la base de données](#modèle-conceptuel-de-la-base-de-données)  
-- [Exécution des tests](#exécution-des-tests)  
-
 ---
 
 ## **Contexte** 🌐
