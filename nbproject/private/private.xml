@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/User.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/DemandeCongeDao.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/DemandeCongeId.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/Admin.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/Departement.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/DemandeConge.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/util/HibernateUtil.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/test/TestProgram.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/EmployeDao.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/index.html</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/config/hibernate1.cfg.xml</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/Employe.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/conf/MANIFEST.MF</file>
+        </group>
+    </open-files>
+</project-private>
