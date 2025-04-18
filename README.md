@@ -73,6 +73,9 @@ Ce projet a pour but de :
 ![Capture d'écran 2025-04-11 133455](https://github.com/user-attachments/assets/966f187d-6a62-40ad-a51f-1ec9ad35d583)
 
 ---
+## **Logo d'entreprise**
+
+![Flux_Dev_Create_a_clean_modern_vector_logo_for_SYSTME_CONG_ENT_0 (1)](https://github.com/user-attachments/assets/fcec6193-f2a9-4cee-9391-040505594bd8)
 
 ## **Page de Connexion**
 
