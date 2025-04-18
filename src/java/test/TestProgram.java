@@ -1,57 +1,65 @@
 package test;
 
+import dao.AdminDao;
+import dao.DepartementDao;
 import dao.EmployeDao;
-import entites.Employe;
+import dao.DemandeCongeDao;
+import entites.Admin;
 import entites.Departement;
-import util.HibernateUtil;
+import entites.Employe;
+import entites.DemandeConge;
 
-import org.hibernate.Session;
-import java.util.List;
+import java.util.Date;
 
-public class TestProgram  {
+public class TestProgram {
 
     public static void main(String[] args) {
-        // Initialiser la session Hibernate
-        HibernateUtil.getSessionFactory();
+        // Instanciation des DAO
+        DepartementDao deptDao      = new DepartementDao();
+        AdminDao      adminDao     = new AdminDao();
+        EmployeDao    employeDao   = new EmployeDao();
+        DemandeCongeDao dcDao      = new DemandeCongeDao();
 
-        // Initialiser le DAO pour les employés
-        EmployeDao employeDao = new EmployeDao();
+        // 1) Création et persistance du département "Informatique"
+        Departement informatique = new Departement();
+        informatique.setNom("Informatique");
+        deptDao.create(informatique);
 
-        // Créer un département (exemple : Informatique)
-        Departement informatique = new Departement(1,"Informatique");
-        
-        // Créer des employés
-        Employe employe1 = new Employe("Ahmed", "ahmed@example.com", "engeneer","informatique");
-        Employe employe2 = new Employe("Fatima", "fatima@example.com",null, null); // Pas de département
-        Employe employe3 = new Employe("Ali", "ali@example.com", "comptable" ,"economie");
-        
-        // Sauvegarder les employés dans la base de données
-        employeDao.create(employe1);
-        employeDao.create(employe2);
-        employeDao.create(employe3);
+        // 2) Création et persistance d’un Admin
+        Admin admin = new Admin(
+            "John", "Doe",
+            "john.doe@example.com",
+            "password123",
+            "admin"
+        );
+        adminDao.create(admin);
 
-        // Afficher tous les employés
-        System.out.println("\nTous les employés :");
-        for (Employe e : employeDao.findAll()) {
-            System.out.println(e);
-        }
+        // 3) Création et persistance d’un Employé
+        Employe employe = new Employe(
+            "engineer",     // poste
+            "Ahmed",        // nom
+            "Mili",         // prénom
+            "ahmed@example.com",
+            "password",     // mot de passe
+            "employe"       // rôle
+        );
+        employe.setDepartement(informatique);
+        employeDao.create(employe);
 
-        // Filtrage des employés par département (Informatique)
-        System.out.println("\nEmployés du département Informatique :");
-        filterEmployesByDepartement(informatique);
-    }
+        // 4) Création et persistance d’une DemandeConge
+        DemandeConge demande = new DemandeConge(
+            employe.getId(),
+            new Date(),
+            new Date(),
+            "En attente",
+            employe
+        );
+        dcDao.create(demande);
 
-    // Méthode pour filtrer et afficher les employés d'un département sans utiliser Query
-    private static void filterEmployesByDepartement(Departement departement) {
-        // Récupérer tous les employés
-        EmployeDao employeDao = new EmployeDao();
-        List<Employe> employes = employeDao.findAll();
-
-        // Filtrer les employés ayant le même département que celui spécifié
-        for (Employe e : employes) {
-            if (e.getDepartement() != null && e.getDepartement().getId() == departement.getId()) {
-                System.out.println(e);
-            }
-        }
+        // 5) Affichage des résultats
+        System.out.println("✅ Données insérées avec succès !");
+        System.out.println("Admin        : " + admin);
+        System.out.println("Employé      : " + employe);
+        System.out.println("DemandeConge : " + demande);
     }
 }

@@ -16,15 +16,29 @@ import javax.persistence.Table;
  * @author hp
  */
 @Entity
+@Table(name = "admin")
+@PrimaryKeyJoinColumn(name = "id")
 public class Admin extends User {
 
     public Admin() {
     }
 
-    public Admin(String nom, String prenom, String email, String password) {
-        super(nom, prenom, email, password);
+   public Admin(String nom, String prenom, String email, String password, String role) {
+        super(nom, prenom, email, password, role);
     }
-    
+    @Override
+    public String toString() {
+            return "Admin{" +
+                    "id=" + getId() +
+                    ", nom='" + getNom() + '\'' +
+                    ", prenom='" + getPrenom() + '\'' +
+                    ", email='" + getEmail() + '\'' +
+                    ", password='" + getPassword() + '\'' +
+                    '}';
+}
+
+
+   
     
     
 }

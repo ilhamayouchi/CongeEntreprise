@@ -1,4 +1,3 @@
-
 package entites;
 
 import javax.persistence.Entity;
@@ -7,8 +6,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-
+@NamedQuery(name  ="findByEmail", query = "from User where email =:email")
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -20,16 +21,19 @@ public class User {
     private String prenom;
     private String email;
     private String password;
+     private String role; 
+
     public User() {
-
     }
 
-    public User(String nom, String prenom, String email, String password) {
-        this.nom = nom;
-        this.prenom = prenom;
-        this.email = email;
+    public User(String nom, String prenom, String email, String password, String role) {
+        this.nom      = nom;
+        this.prenom   = prenom;
+        this.email    = email;
         this.password = password;
+        this.role     = role;
     }
+
 
     public int getId() {
         return id;
@@ -71,4 +75,11 @@ public class User {
         this.password = password;
     }
 
+     public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }

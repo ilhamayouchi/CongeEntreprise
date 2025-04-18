@@ -14,6 +14,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -21,7 +23,18 @@ import javax.persistence.Table;
  *
  * @author hp
  */
+@NamedQueries({
+    @NamedQuery(
+        name = "Employe.findByNomAndDepartement",
+        query = "SELECT e FROM Employe e WHERE e.nom = :nom AND e.departement.nom = :departementNom"
+    ),
+    @NamedQuery(
+        name = "Employe.findByNom",
+        query = "SELECT e FROM Employe e WHERE e.nom = :nom"
+    )
+})
 @Entity
+@Table(name = "employes")
 public class Employe extends User {
  
 
@@ -32,11 +45,13 @@ public class Employe extends User {
     @JoinColumn(name = "departement_id")
     private Departement departement;
 
-    public Employe() {
+    public Employe(String poste) {
+        this.poste = poste;
     }
 
-    public Employe(String nom, String prenom, String email, String password) {
-        super(nom, prenom, email, password);
+    public Employe(String poste, String nom, String prenom, String email, String password, String role) {
+        super(nom, prenom, email, password, role);
+        this.poste = poste;
     }
 
     public String getPoste() {
