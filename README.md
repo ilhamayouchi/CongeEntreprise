@@ -78,4 +78,7 @@ Ce projet a pour but de :
 
 ![Capture d'écran 2025-04-18 194330](https://github.com/user-attachments/assets/d3905991-ebc2-48b5-b010-342168e9f540)
 
+## **Tbleau de bord Admin**
+
+![image](https://github.com/user-attachments/assets/953880a0-4203-436d-8085-051d2f5d0a21)
 
