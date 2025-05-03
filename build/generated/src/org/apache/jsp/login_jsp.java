@@ -227,7 +227,7 @@ public final class login_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("    <div class=\"login-container\">\n");
       out.write("        <!-- Logo intégré - Remplacez le src par votre image -->\n");
       out.write("        <div class=\"logo-container\">\n");
-      out.write("            <img src=\"/img/Untitled design (15).png\" alt=\"SYSTME CONGE ENTREPRISE\" class=\"logo\">\n");
+      out.write("            <img src=# alt=\"SYSTME CONGE ENTREPRISE\" class=\"logo\">\n");
       out.write("        </div>\n");
       out.write("\n");
       out.write("        <form method=\"post\" action=\"LoginController\">\n");

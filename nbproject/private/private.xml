@@ -3,32 +3,52 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/test/TestFindByEmail.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/inscription.jsp</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/AdminController.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/AuthController.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/employes.jsp</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/departements.jsp</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/DemandeCongeId.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/Admin.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/Departement.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/motdepasseOublie.jsp</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/DemandeConge.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/LoginController.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/util/HibernateUtil.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/DepartementDao.java</file>
-            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/login.jsp</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/services/DepartementService.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/test/TestEmployeService.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/index.html</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/forgotPassword.jsp</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/InscriptionController.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/IDao.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/adminDashbord.jsp</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/Employe.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/AbstractDao.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/conf/MANIFEST.MF</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/UserController.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/DepartementController.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/test/TestFindByNom.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/entites/User.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/test/TestFindByDepartement.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/UserDao.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/services/DemandeCongeService.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/login.jsp</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/DemandeCongeDao.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/ajouterEmploye.jsp</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/listeDemande.jsp</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/services/Iservice.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/services/UserService.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/services/AuthentificationService.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/EmployeController.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/test/TestProgram.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/EmployeDao.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/dao/AdminDao.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/DemandeCongeController.java</file>
             <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/config/hibernate1.cfg.xml</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/web/users/nemployeDashboard.jsp</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/services/EmployeService.java</file>
+            <file>file:/C:/Users/hp/Documents/NetBeansProjects/EntrepriseConge/src/java/controllers/AdminServlet.java</file>
         </group>
     </open-files>
 </project-private>

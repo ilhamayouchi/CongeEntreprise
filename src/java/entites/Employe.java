@@ -31,6 +31,10 @@ import javax.persistence.Table;
     @NamedQuery(
         name = "Employe.findByNom",
         query = "SELECT e FROM Employe e WHERE e.nom = :nom"
+    ),
+     @NamedQuery(
+        name = "findClientByEmail",
+        query = "SELECT e FROM Employe e WHERE e.email = :email"
     )
 })
 @Entity
@@ -48,6 +52,10 @@ public class Employe extends User {
     public Employe(String poste) {
         this.poste = poste;
     }
+
+    public Employe() {
+    }
+    
 
     public Employe(String poste, String nom, String prenom, String email, String password, String role) {
         super(nom, prenom, email, password, role);
@@ -69,7 +77,14 @@ public class Employe extends User {
     public void setDepartement(Departement departement) {
         this.departement = departement;
     }
-    
+    // Ajoutez cette méthode pour faciliter le debug
+public String toDebugString() {
+    return String.format(
+        "Employe[nom=%s, prenom=%s, email=%s, poste=%s, departement=%s]",
+        getNom(), getPrenom(), getEmail(), poste, 
+        (departement != null ? departement.getNom() : "null")
+    );
+}
    @Override
     public String toString() {
      return "Employe{" +

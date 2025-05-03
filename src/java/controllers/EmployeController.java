@@ -3,101 +3,169 @@ package controllers;
 import entites.Departement;
 import entites.Employe;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import services.DepartementService;
 import services.EmployeService;
 
 @WebServlet(name = "EmployeController", urlPatterns = {"/EmployeController"})
 public class EmployeController extends HttpServlet {
 
-    private EmployeService es;
+    private EmployeService employeService;
+    private DepartementService departementService;
 
     @Override
     public void init() throws ServletException {
-        super.init();
-        es = new EmployeService();
-    }
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        String op    = request.getParameter("op");
-        String idStr = request.getParameter("id");
-
-        if (op == null) {
-            String poste    = request.getParameter("poste");
-            String nom      = request.getParameter("nom");
-            String prenom   = request.getParameter("prenom");
-            String email    = request.getParameter("email");
-            String mdp      = request.getParameter("mdp");
-            String role     = "employe";  
-            String depIdStr = request.getParameter("departementId");
-            Departement d = null;
-            if (depIdStr != null && !depIdStr.isEmpty()) {
-                d = new Departement();
-                d.setId(Integer.parseInt(depIdStr));
-            }
-
-            if (idStr == null || idStr.isEmpty()) {
-                Employe e = new Employe(poste, nom, prenom, email, mdp, role);
-                e.setDepartement(d);
-                es.create(e);
-
-            } else {
-                int id = Integer.parseInt(idStr);
-                Employe e = new Employe(poste, nom, prenom, email, mdp, role);
-                e.setId(id);
-                e.setDepartement(d);
-                es.update(e);
-            }
-
-            response.sendRedirect("listeEmployes.jsp");
-
-        } else if ("delete".equals(op)) {
-            int id = Integer.parseInt(idStr);
-            Employe e = es.findById(id);
-            if (e != null) {
-                es.delete(e);
-            }
-            response.sendRedirect("listeEmployes.jsp");
-
-        } else if ("update".equals(op)) {
-         
-            int id = Integer.parseInt(idStr);
-            Employe e = es.findById(id);
-            if (e != null) {
-                StringBuilder url = new StringBuilder("employeForm.jsp?");
-                url.append("id=").append(e.getId())
-                   .append("&poste=").append(e.getPoste())
-                   .append("&nom=").append(e.getNom())
-                   .append("&prenom=").append(e.getPrenom())
-                   .append("&email=").append(e.getEmail())
-                   .append("&mdp=").append(e.getPassword());
-                if (e.getDepartement() != null) {
-                    url.append("&departementId=").append(e.getDepartement().getId());
-                }
-                response.sendRedirect(url.toString());
-                return;
-            }
-            response.sendRedirect("listeEmployes.jsp");
-        }
+        employeService = new EmployeService();
+        departementService = new DepartementService();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        processRequest(req, resp);
+        // Vérifier la session et l'utilisateur
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            resp.sendRedirect(req.getContextPath() + "/users/login.jsp");
+            return;
+        }
+
+        // Rediriger vers la page des employés
+        resp.sendRedirect(req.getContextPath() + "/users/employes.jsp");
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        processRequest(req, resp);
-    }
+        // Set character encoding
+        req.setCharacterEncoding("UTF-8");
+        
+        // Vérifier la session et l'utilisateur
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            resp.sendRedirect(req.getContextPath() + "/users/login.jsp");
+            return;
+        }
 
-    @Override
-    public String getServletInfo() {
-        return "Servlet de gestion des employés (CRUD)";
+        String op = req.getParameter("op");
+        System.out.println("Operation: " + op); // Debug log
+        
+        try {
+            if ("delete".equals(op)) {
+                // Suppression d'un employé
+                int id = Integer.parseInt(req.getParameter("id"));
+                System.out.println("Deleting employee with ID: " + id); // Debug log
+                
+                Employe toDelete = employeService.findById(id);
+                if (toDelete != null) {
+                    employeService.delete(toDelete);
+                }
+            } else if ("update".equals(op)) {
+                // Mise à jour d'un employé existant
+                updateEmployee(req);
+            } else if ("create".equals(op)) {
+                // Création d'un nouvel employé
+                createEmployee(req);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error in EmployeController: " + e.getMessage()); // Debug log
+        }
+
+        // Rediriger vers la page des employés
+        resp.sendRedirect(req.getContextPath() + "/users/employes.jsp");
+    }
+    
+    private void createEmployee(HttpServletRequest req) {
+        try {
+            String nom = req.getParameter("nom");
+            String prenom = req.getParameter("prenom");
+            String email = req.getParameter("email");
+            String role = req.getParameter("role");
+            String poste = req.getParameter("poste");
+            String password = req.getParameter("password");
+            String departementIdStr = req.getParameter("departementId");
+            
+            System.out.println("Creating employee: " + nom + " " + prenom); // Debug log
+            
+            // Validation des champs obligatoires
+            if (nom == null || prenom == null || email == null || role == null || 
+                poste == null || password == null || departementIdStr == null) {
+                System.out.println("Missing required fields"); // Debug log
+                return;
+            }
+            
+            // Récupérer le département
+            int departementId = Integer.parseInt(departementIdStr);
+            Departement departement = departementService.findById(departementId);
+            
+            // Créer l'employé
+            Employe employe = new Employe();
+            employe.setNom(nom);
+            employe.setPrenom(prenom);
+            employe.setEmail(email);
+            employe.setRole(role);
+            employe.setPoste(poste);
+            employe.setPassword(password);
+            employe.setDepartement(departement);
+            
+            // Sauvegarder l'employé
+            employeService.create(employe);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error creating employee: " + e.getMessage()); // Debug log
+        }
+    }
+    
+    private void updateEmployee(HttpServletRequest req) {
+        try {
+            int id = Integer.parseInt(req.getParameter("id"));
+            String nom = req.getParameter("nom");
+            String prenom = req.getParameter("prenom");
+            String email = req.getParameter("email");
+            String role = req.getParameter("role");
+            String poste = req.getParameter("poste");
+            String password = req.getParameter("password");
+            String departementIdStr = req.getParameter("departementId");
+            
+            System.out.println("Updating employee ID: " + id); // Debug log
+            
+            // Récupérer l'employé existant
+            Employe employe = employeService.findById(id);
+            if (employe == null) {
+                System.out.println("Employee not found with ID: " + id); // Debug log
+                return;
+            }
+            
+            // Mettre à jour les champs
+            employe.setNom(nom);
+            employe.setPrenom(prenom);
+            employe.setEmail(email);
+            employe.setRole(role);
+            employe.setPoste(poste);
+            
+            // Ne mettre à jour le mot de passe que s'il est fourni
+            if (password != null && !password.trim().isEmpty()) {
+                employe.setPassword(password);
+            }
+            
+            // Mettre à jour le département
+            if (departementIdStr != null && !departementIdStr.isEmpty()) {
+                int departementId = Integer.parseInt(departementIdStr);
+                Departement departement = departementService.findById(departementId);
+                employe.setDepartement(departement);
+            }
+            
+            // Sauvegarder les modifications
+            employeService.update(employe);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error updating employee: " + e.getMessage()); // Debug log
+        }
     }
 }

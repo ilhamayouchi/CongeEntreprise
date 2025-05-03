@@ -77,6 +77,10 @@ public class DemandeConge {
     public void setEmploye(Employe employe) {
         this.employe = employe;
     }
+    
+    public DemandeCongeId getId() {
+        return new DemandeCongeId(employeId, dateDebut, dateFin);
+    }
     @Override
     public String toString() {
      return "DemandeConge{" +

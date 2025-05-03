@@ -38,7 +38,7 @@ public class UserController extends HttpServlet {
 
                 // Mot de passe non haché (conforme à ta demande)
                 us.create(new User(nom, prenom, email, mdp, role));
-                response.sendRedirect("users/users.jsp");
+                response.sendRedirect("users.jsp");
 
             } else {
                 // Mise à jour d'un utilisateur existant
@@ -51,18 +51,18 @@ public class UserController extends HttpServlet {
                 User u = new User(nom, prenom, email, mdp, role);
                 u.setId(Integer.parseInt(id));
                 us.update(u);
-                response.sendRedirect("users/users.jsp");
+                response.sendRedirect("users.jsp");
             }
 
         } else if (op.equals("delete")) {
             String id = request.getParameter("id");
             us.delete(us.findById(Integer.parseInt(id)));
-            response.sendRedirect("users/users.jsp");
+            response.sendRedirect("users.jsp");
 
         } else if (op.equals("update")) {
             String id = request.getParameter("id");
             User u = us.findById(Integer.parseInt(id));
-            response.sendRedirect("users/user.jsp?id=" + u.getId()
+            response.sendRedirect("user.jsp?id=" + u.getId()
                     + "&nom=" + u.getNom()
                     + "&prenom=" + u.getPrenom()
                     + "&email=" + u.getEmail()
