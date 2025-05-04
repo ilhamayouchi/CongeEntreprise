@@ -55,33 +55,6 @@ Ce projet a pour but de :
 
 ![image](https://github.com/user-attachments/assets/4c18e59a-8691-47d2-b8d8-2f019e24e4cf)
 
-## **Exécution des tests dans la console** 💻
+## **Architecture**
 
-![Capture d'écran 2025-04-11 131217](https://github.com/user-attachments/assets/e207f899-57cb-4d2f-9ff2-4520c56a35fc)
-
----
-![Capture d'écran 2025-04-11 133431](https://github.com/user-attachments/assets/61d69fee-31aa-400c-a7f6-7867eddb0dac)
-
-
----
-
-![Capture d'écran 2025-04-11 133445](https://github.com/user-attachments/assets/6e320d86-890b-4295-889b-22ae0089b6de)
-
-
----
-
-![Capture d'écran 2025-04-11 133455](https://github.com/user-attachments/assets/966f187d-6a62-40ad-a51f-1ec9ad35d583)
-
----
-## **Logo d'entreprise**
-
-![Flux_Dev_Create_a_clean_modern_vector_logo_for_SYSTME_CONG_ENT_0 (1)](https://github.com/user-attachments/assets/fcec6193-f2a9-4cee-9391-040505594bd8)
-
-## **Page de Connexion**
-
-![Capture d'écran 2025-04-18 194330](https://github.com/user-attachments/assets/d3905991-ebc2-48b5-b010-342168e9f540)
-
-## **Tbleau de bord Admin**
-
-![image](https://github.com/user-attachments/assets/953880a0-4203-436d-8085-051d2f5d0a21)
-
+![La couche Service et Controllers](https://github.com/user-attachments/assets/b4998bdc-b905-424e-b9df-f3d780cdf0d2)
