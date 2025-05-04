@@ -40,7 +40,7 @@ Ce projet a pour but de :
 
 ## **Technologies Utilisées** 🛠
 
-- 💻 **JavaWeb** *(ou ton stack personnel)*  
+- 💻 **JavaWeb**   
 - 🗃️ **MySQL**  
 - ⚡ **AJAX** pour les validations en temps réel  
 - 📈 **Chart.js** pour les statistiques par département  
@@ -58,3 +58,11 @@ Ce projet a pour but de :
 ## **Architecture**
 
 ![La couche Service et Controllers](https://github.com/user-attachments/assets/b4998bdc-b905-424e-b9df-f3d780cdf0d2)
+
+## **Vidéo démonstrative**
+
+
+
+https://github.com/user-attachments/assets/aeb4435a-cca1-4419-9158-57d83f87b636
+
+
