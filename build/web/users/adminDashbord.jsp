@@ -1,9 +1,3 @@
-<%-- 
-    Document   : adminDashbord
-    Created on : 18 avr. 2025, 00:32:17
-    Author     : hp
---%>
-
 <%@page import="services.DemandeCongeService"%>
 <%@page import="entites.DemandeConge"%>
 <%@page import="services.EmployeService"%>
@@ -17,20 +11,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
   // Initialize services
-
     DemandeCongeService demandeCongeService = new DemandeCongeService();
-
     
     // Get data counts
-    
     List<DemandeConge> demandes = demandeCongeService.listerToutesDemandes();
-
     
     // Set counts as attributes for JSTL
-
     request.setAttribute("demandeCount", demandes != null ? demandes.size() : 0);
-   
-    
     
     // Récupération 
     EmployeService employeService = (EmployeService) session.getAttribute("employeService");
@@ -60,272 +47,1344 @@
     } else {
         departements = new ArrayList<Departement>();
     }
+    
+    // Calculate pending requests
+    int pendingRequests = 0;
+    if (demandes != null) {
+        for (DemandeConge demande : demandes) {
+            if (demande.getStatut() != null && demande.getStatut().equals("En attente")) {
+                pendingRequests++;
+            }
+        }
+    }
 %>
+<%
+
+    if (session == null || session.getAttribute("user") == null) {
+        // Empêche l'accès sans session valide
+        response.sendRedirect(request.getContextPath() + "/users/login.jsp");
+        return;
+    }
+
+    // Empêche le cache (empêche bouton "back" de fonctionner après logout)
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
+
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Dashboard Admin</title>
-    </head>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Système Congé Entreprise</title>
+    <!-- Bootstrap & FontAwesome CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* === Theme Variables === */
+        :root {
+            /* Professional Dark Theme */
+            --bg-color-dark: #1a1d2b;
+            --card-bg-dark: #242736;
+            --text-color-dark: #e6e8f0;
+            --text-muted-dark: #a0a3b1;
+            --primary-color-dark: #4f6df5;
+            --primary-hover-dark: #3a56d4;
+            --secondary-color-dark: #6c757d;
+            --input-bg-dark: #2e3241;
+            --input-border-dark: #3d4153;
+            --input-focus-dark: #4f6df5;
+            --particle-color-dark: rgba(79, 109, 245, 0.2);
+            --shadow-dark: 0 8px 30px rgba(0, 0, 0, 0.3);
+            --footer-bg-dark: #242736;
+            --footer-text-dark: #a0a3b1;
+            --table-header-dark: #2e3241;
+            --table-border-dark: #3d4153;
+            --table-row-hover-dark: #2a2e3d;
+            --status-pending-dark: #ffc107;
+            --status-approved-dark: #28a745;
+            --status-rejected-dark: #dc3545;
+            --sidebar-bg-dark: #242736;
+            --sidebar-hover-dark: #2a2e3d;
+            --sidebar-active-dark: #3a56d4;
+            
+            /* Professional Light Theme */
+            --bg-color-light: #f5f7fa;
+            --card-bg-light: #ffffff;
+            --text-color-light: #333b4d;
+            --text-muted-light: #6c757d;
+            --primary-color-light: #4361ee;
+            --primary-hover-light: #3a56d4;
+            --secondary-color-light: #6c757d;
+            --input-bg-light: #ffffff;
+            --input-border-light: #d1d9e6;
+            --input-focus-light: #4361ee;
+            --particle-color-light: rgba(67, 97, 238, 0.1);
+            --shadow-light: 0 8px 30px rgba(0, 0, 0, 0.1);
+            --footer-bg-light: #f8f9fa;
+            --footer-text-light: #6c757d;
+            --table-header-light: #f8f9fa;
+            --table-border-light: #dee2e6;
+            --table-row-hover-light: #f1f3f9;
+            --status-pending-light: #ffc107;
+            --status-approved-light: #28a745;
+            --status-rejected-light: #dc3545;
+            --sidebar-bg-light: #ffffff;
+            --sidebar-hover-light: #f1f3f9;
+            --sidebar-active-light: #4361ee;
+        }
+
+        /* === Apply Theme Variables === */
+        html[data-theme="dark"] {
+            --bg-color: var(--bg-color-dark);
+            --card-bg: var(--card-bg-dark);
+            --text-color: var(--text-color-dark);
+            --text-muted: var(--text-muted-dark);
+            --primary-color: var(--primary-color-dark);
+            --primary-hover: var(--primary-hover-dark);
+            --secondary-color: var(--secondary-color-dark);
+            --input-bg: var(--input-bg-dark);
+            --input-border: var(--input-border-dark);
+            --input-focus: var(--input-focus-dark);
+            --particle-color: var(--particle-color-dark);
+            --shadow: var(--shadow-dark);
+            --footer-bg: var(--footer-bg-dark);
+            --footer-text: var(--footer-text-dark);
+            --table-header: var(--table-header-dark);
+            --table-border: var(--table-border-dark);
+            --table-row-hover: var(--table-row-hover-dark);
+            --status-pending: var(--status-pending-dark);
+            --status-approved: var(--status-approved-dark);
+            --status-rejected: var(--status-rejected-dark);
+            --sidebar-bg: var(--sidebar-bg-dark);
+            --sidebar-hover: var(--sidebar-hover-dark);
+            --sidebar-active: var(--sidebar-active-dark);
+        }
+        
+        html[data-theme="light"] {
+            --bg-color: var(--bg-color-light);
+            --card-bg: var(--card-bg-light);
+            --text-color: var(--text-color-light);
+            --text-muted: var(--text-muted-light);
+            --primary-color: var(--primary-color-light);
+            --primary-hover: var(--primary-hover-light);
+            --secondary-color: var(--secondary-color-light);
+            --input-bg: var(--input-bg-light);
+            --input-border: var(--input-border-light);
+            --input-focus: var(--input-focus-light);
+            --particle-color: var(--particle-color-light);
+            --shadow: var(--shadow-light);
+            --footer-bg: var(--footer-bg-light);
+            --footer-text: var(--footer-text-light);
+            --table-header: var(--table-header-light);
+            --table-border: var(--table-border-light);
+            --table-row-hover: var(--table-row-hover-light);
+            --status-pending: var(--status-pending-light);
+            --status-approved: var(--status-approved-light);
+            --status-rejected: var(--status-rejected-light);
+            --sidebar-bg: var(--sidebar-bg-light);
+            --sidebar-hover: var(--sidebar-hover-light);
+            --sidebar-active: var(--sidebar-active-light);
+        }
+
+        /* === Reset & global === */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
         body {
             font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            background-color: #f4f4f4;
-        }
-
-        .container {
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease, color 0.3s ease;
         }
-
-        .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: #fff;
-            padding: 20px;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar ul li {
-            margin: 20px 0;
-        }
-
-        .sidebar ul li a {
-            color: #ecf0f1;
+        
+        a { 
             text-decoration: none;
-            font-size: 16px;
+            color: var(--primary-color);
+            transition: color 0.2s ease;
+        }
+        
+        a:hover {
+            color: var(--primary-hover);
         }
 
-        .logo {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .content {
+        /* === Layout === */
+        .app-container {
+            display: flex;
             flex: 1;
-            padding: 20px;
-        }
-
-        section {
-            margin-bottom: 40px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .btn {
-            background-color: #2ecc71;
-            padding: 10px 15px;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        .btn:hover {
-            background-color: #27ae60;
-        }
-
-        .action {
-            margin: 0 5px;
-            text-decoration: none;
-            color: #2980b9;
-            font-weight: bold;
-        }
-
-        .stats {
-            list-style: none;
-            padding: 0;
-            font-size: 18px;
-        }
-
-        .stats li {
-            margin-bottom: 10px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            padding-top: 100px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-
-        .modal-content {
-            background-color: #fff;
-            margin: auto;
-            padding: 20px;
-            border-radius: 10px;
-            width: 400px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             position: relative;
         }
 
-        .modal-content input, .modal-content select {
+        /* === Particules === */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
         }
-
-        .modal-content .close {
+        
+        .particle {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            color: #aaa;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
+            background: var(--particle-color);
+            border-radius: 50%;
+            animation-name: float;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        
+        @keyframes float {
+            from { transform: translateY(0); }
+            to   { transform: translateY(-120vh); }
         }
 
-        .modal-content .close:hover {
-            color: #000;
-        }
-        .stats-buttons {
+        /* === Header === */
+        .app-header {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
             display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
         }
-
-        .stat-button {
-            background-color: #1d3557;
-            color: white;
-            border: none;
-            padding: 20px;
-            width: 180px;
-            height: 120px;
-            border-radius: 15px;
-            font-size: 18px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: 0.3s ease;
+        
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .app-logo {
+            width: 36px;
+            height: 36px;
+        }
+        
+        .app-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+        
+        .app-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            background: var(--input-bg);
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .user-menu:hover {
+            background: var(--table-row-hover);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-name {
+            font-weight: 500;
+        }
+        
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(0,0,0,0.05);
+            color: var(--primary-color);
         }
 
-        .stat-button:hover {
-            background-color: #457b9d;
+        /* === Sidebar === */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: var(--text-color);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--table-border);
+        }
+        
+        .sidebar-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 1rem;
+            padding: 0 1.5rem;
+        }
+        
+        .nav-section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1.5rem;
+            color: var(--text-color);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background: var(--sidebar-hover);
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-text {
+            font-weight: 500;
+        }
+        
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--table-border);
+            text-align: center;
+        }
+        
+        .sidebar-footer-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
+        /* === Main Content === */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            overflow-x: hidden;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+        }
 
-    </style>
-    <body>
-        <div class="container">
-            <nav class="sidebar">
-                <img src="<%=request.getContextPath()%>/images/logo.png" alt="Logo" class="logo">
-                <h2>Admin Panel</h2>
-                <ul>
-                    <li><a href="<%= request.getContextPath() %>/users/employes.jsp">👤 Gestion des Employés</a></li>
-                    <li><a href="<%= request.getContextPath() %>/users/listeDemande.jsp">📄 Gestion des Demandes de Congés</a></li>
-                    <li><a href="<%= request.getContextPath() %>/users/graphe.jsp">📊 Statistiques</a></li>
-                   <li><a href="${pageContext.request.contextPath}/DeconnexionController">🚪 Déconnexion</a></li>
-                </ul>
-            </nav>
+        /* === Dashboard Cards === */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow), 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-icon {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(79, 109, 245, 0.1);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-title {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .trend-up {
+            color: var(--status-approved);
+        }
+        
+        .trend-down {
+            color: var(--status-rejected);
+        }
 
-            <main class="content">
-                <!-- Section Employés -->
-                <section id="employes">
-                    <h2>Tableau de bord </h2>
+        /* === Dashboard Section === */
+        .dashboard-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
 
-                    <h2>Liste des Employés</h2>
-                    <table>
-        <thead>
-          <tr>
-            <th>Nom</th><th>Prénom</th><th>Email</th><th>Poste</th><th>Role</th><th>Mot de passe</th><th>Département</th>
-          </tr>
-        </thead>
-        <tbody>
-        <% for (int i = 0; i < employes.size(); i++) {
-             Employe e = (Employe) employes.get(i);
-        %>
-          <tr>
-            <td><%= e.getNom() %></td>
-            <td><%= e.getPrenom() %></td>
-            <td><%= e.getEmail() %></td>
-            <td><%= e.getPoste() %></td>
-            <td><%= e.getRole() %></td>
-            <td><%= e.getPassword() %></td>
-            <td><%= (e.getDepartement() != null) ? e.getDepartement().getNom() : "Non affecté" %></td>
+        /* === Table === */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--table-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .table-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .data-table th {
+            background: var(--table-header);
+            color: var(--text-color);
+            font-weight: 600;
+            text-align: left;
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid var(--table-border);
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--table-border);
+            color: var(--text-color);
+        }
+        
+        .data-table tr:hover td {
+            background: var(--table-row-hover);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--table-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .table-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .table-pagination {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--table-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .page-btn:hover {
+            background: var(--table-row-hover);
+            border-color: var(--primary-color);
+        }
+        
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* === Status Badges === */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: var(--status-pending);
+        }
+        
+        .status-approved {
+            background: rgba(40, 167, 69, 0.15);
+            color: var(--status-approved);
+        }
+        
+        .status-rejected {
+            background: rgba(220, 53, 69, 0.15);
+            color: var(--status-rejected);
+        }
+
+        /* === Buttons === */
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 0.85rem;
+            font-size: 0.85rem;
+        }
+        
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 6px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+        
+        .btn-secondary {
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--table-border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--table-row-hover);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-success {
+            background: var(--status-approved);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: var(--status-rejected);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-warning {
+            background: var(--status-pending);
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--table-border);
+            color: var(--text-color);
+        }
+        
+        .btn-outline:hover {
+            background: var(--table-row-hover);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* === Footer === */
+        .app-footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .footer-link {
+            color: var(--footer-text);
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin: 0.5rem 0;
+        }
+        
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.05);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+        
+        .social-icon:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .footer-copyright {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                overflow: visible;
+            }
             
-          </tr>
-        <% } %>
-        </tbody>
-      </table>
-                </section>
+            .sidebar-header {
+                padding: 1rem 0.5rem;
+            }
+            
+            .sidebar-title, .sidebar-subtitle, .nav-text, .nav-section-title {
+                display: none;
+            }
+            
+            .nav-link {
+                padding: 0.85rem;
+                justify-content: center;
+            }
+            
+            .sidebar-footer {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .app-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header, .table-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .table-actions, .table-pagination {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particules Background -->
+    <div id="particles"></div>
+    
+    <!-- Header -->
+    <header class="app-header">
+        <div class="app-brand">
+            <!-- SVG Logo -->
+            <svg class="app-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="17" rx="2" fill="var(--primary-color)" opacity="0.2"/>
+                <rect x="3" y="4" width="18"  rx="2" fill="var(--primary-color)" opacity="0.2"/>
+                <rect x="3" y="4" width="18" height="17" rx="2" stroke="var(--primary-color)" stroke-width="2"/>
+                <path d="M8 2V6" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M16 2V6" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M3 10H21" stroke="var(--primary-color)" stroke-width="2"/>
+                <circle cx="12" cy="15" r="2" fill="var(--primary-color)"/>
+            </svg>
+            <h1 class="app-title">Système Congé Entreprise</h1>
+        </div>
+        <div class="app-actions">
+            <div class="user-menu">
+                <div class="user-avatar">A</div>
+                <span class="user-name">Admin</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
 
-                
-
-               <!-- Statistiques -->
-        <section id="stats">
-            <h2>📊 Statistiques</h2>
-            <div class="stats-buttons">
-                <div class="stat-button">
-                    👤 Employés<br>
-                    <strong>
-                        <% if (request.getAttribute("employeCount") != null) { %>
-                            <%= request.getAttribute("employeCount") %>
-                        <% } else { %>
-                            <%= employes != null ? employes.size() : 0 %>
-                        <% } %>
-                    </strong>
-                </div>
-                <div class="stat-button">
-                    📝 Congés<br>
-                    <strong>
-                        <% if (request.getAttribute("demandeCount") != null) { %>
-                            <%= request.getAttribute("demandeCount") %>
-                        <% } else { %>
-                            <%= demandes != null ? demandes.size() : 0 %>
-                        <% } %>
-                    </strong>
-                </div>
-                <div class="stat-button">
-                    🏢 Départements<br>
-                    <strong>
-                        <% if (request.getAttribute("departementCount") != null) { %>
-                            <%= request.getAttribute("departementCount") %>
-                        <% } else { %>
-                            <%= departements != null ? departements.size() : 0 %>
-                        <% } %>
-                    </strong>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <svg class="sidebar-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="4" width="18" height="17" rx="2" fill="var(--primary-color)" opacity="0.2"/>
+                        <rect x="3" y="4" width="18" height="17" rx="2" stroke="var(--primary-color)" stroke-width="2"/>
+                        <path d="M8 2V6" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 2V6" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M3 10H21" stroke="var(--primary-color)" stroke-width="2"/>
+                        <circle cx="12" cy="15" r="2" fill="var(--primary-color)"/>
+                    </svg>
+                    <h2 class="sidebar-title">Admin Panel</h2>
+                    <p class="sidebar-subtitle">Gestion des congés</p>
                 </div>
             </div>
-        </section>
-            </main>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Gestion</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="<%= request.getContextPath() %>/users/adminDashbord.jsp" class="nav-link active">
+                                <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                                <span class="nav-text">Tableau de bord</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<%= request.getContextPath() %>/users/employes.jsp" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-users"></i></span>
+                                <span class="nav-text">Employés</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<%= request.getContextPath() %>/users/listeDemande.jsp" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+                                <span class="nav-text">Demandes de congés</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<%= request.getContextPath() %>/users/graphe.jsp" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                                <span class="nav-text">Statistiques</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Paramètres</h3>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                                <span class="nav-text">Configuration</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="${pageContext.request.contextPath}/DeconnexionController" class="nav-link">
+                                <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                                <span class="nav-text">Déconnexion</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p class="sidebar-footer-text">&copy; <%= java.time.Year.now().getValue() %> Entreprise Congé</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Tableau de bord administrateur</span>
+                </h1>
+                <div class="page-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        <span>Exporter les données</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="stat-title">Employés</h3>
+                    <div class="stat-value"><%= employes != null ? employes.size() : 0 %></div>
+                    <p class="stat-description">Nombre total d'employés</p>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 class="stat-title">Demandes de congés</h3>
+                    <div class="stat-value"><%= demandes != null ? demandes.size() : 0 %></div>
+                    <p class="stat-description">Nombre total de demandes</p>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="stat-title">Départements</h3>
+                    <div class="stat-value"><%= departements != null ? departements.size() : 0 %></div>
+                    <p class="stat-description">Nombre total de départements</p>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="stat-title">En attente</h3>
+                    <div class="stat-value"><%= pendingRequests %></div>
+                    <p class="stat-description">Demandes à traiter</p>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+5% cette semaine</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employees Table -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-users"></i>
+                        <span>Liste des employés</span>
+                    </h2>
+                    <div class="section-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-filter"></i>
+                            <span>Filtrer</span>
+                        </button>
+                        <a href="<%= request.getContextPath() %>/users/employes.jsp" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i>
+                            <span>Ajouter un employé</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Employés</h3>
+                        <div class="table-actions">
+                            <div class="btn btn-outline btn-sm">
+                                <i class="fas fa-search"></i>
+                                <span>Rechercher</span>
+                            </div>
+                            <div class="btn btn-outline btn-sm">
+                                <i class="fas fa-download"></i>
+                                <span>Exporter</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Email</th>
+                                    <th>Poste</th>
+                                    <th>Rôle</th>
+                                    <th>Département</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (employes != null && !employes.isEmpty()) { %>
+                                    <% for (Employe e : employes) { %>
+                                        <tr>
+                                            <td><%= e.getNom() %></td>
+                                            <td><%= e.getPrenom() %></td>
+                                            <td><%= e.getEmail() %></td>
+                                            <td><%= e.getPoste() %></td>
+                                            <td>
+                                                <% if (e.getRole() != null && e.getRole().equals("admin")) { %>
+                                                    <span class="status-badge status-approved">
+                                                        <i class="fas fa-user-shield"></i> Admin
+                                                    </span>
+                                                <% } else { %>
+                                                    <span class="status-badge">
+                                                        <i class="fas fa-user"></i> Employé
+                                                    </span>
+                                                <% } %>
+                                            </td>
+                                            <td><%= (e.getDepartement() != null) ? e.getDepartement().getNom() : "Non affecté" %></td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-outline btn-icon btn-sm" title="Voir">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline btn-icon btn-sm" title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline btn-icon btn-sm" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="7" style="text-align: center; padding: 2rem;">
+                                            <i class="fas fa-users" style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem; display: block;"></i>
+                                            <p>Aucun employé trouvé</p>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-footer">
+                        <div class="table-info">
+                            Affichage de <strong>1-<%= Math.min(10, employes != null ? employes.size() : 0) %></strong> sur <strong><%= employes != null ? employes.size() : 0 %></strong> employés
+                        </div>
+                        <div class="table-pagination">
+                            <button class="page-btn" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Leave Requests -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Demandes de congés récentes</span>
+                    </h2>
+                    <div class="section-actions">
+                        <a href="<%= request.getContextPath() %>/users/listeDemande.jsp" class="btn btn-primary btn-sm">
+                            <i class="fas fa-list"></i>
+                            <span>Voir toutes les demandes</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Employé</th>
+                                    <th>Date début</th>
+                                    <th>Date fin</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (demandes != null && !demandes.isEmpty()) { 
+                                    // Limit to 5 most recent requests
+                                    int count = 0;
+                                    for (DemandeConge dc : demandes) {
+                                        if (count >= 5) break;
+                                        count++;
+                                %>
+                                    <tr>
+                                        <td>
+                                            <% 
+                                                String employeName = "Employé";
+                                                if (dc.getEmploye() != null) {
+                                                    employeName = dc.getEmploye().getNom() + " " + dc.getEmploye().getPrenom();
+                                                }
+                                            %>
+                                            <%= employeName %>
+                                        </td>
+                                        <td><%= dc.getDateDebut() %></td>
+                                        <td><%= dc.getDateFin() %></td>
+                                        <td>
+                                            <% if (dc.getStatut() != null) { %>
+                                                <% if (dc.getStatut().equals("En attente")) { %>
+                                                    <span class="status-badge status-pending">
+                                                        <i class="fas fa-clock"></i> <%= dc.getStatut() %>
+                                                    </span>
+                                                <% } else if (dc.getStatut().equals("Approuvé") || dc.getStatut().equals("Approuvée")) { %>
+                                                    <span class="status-badge status-approved">
+                                                        <i class="fas fa-check"></i> <%= dc.getStatut() %>
+                                                    </span>
+                                                <% } else { %>
+                                                    <span class="status-badge status-rejected">
+                                                        <i class="fas fa-times"></i> <%= dc.getStatut() %>
+                                                    </span>
+                                                <% } %>
+                                            <% } else { %>
+                                                <span class="status-badge">Non défini</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-success btn-icon btn-sm" title="Approuver">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-icon btn-sm" title="Refuser">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                                <button class="btn btn-outline btn-icon btn-sm" title="Détails">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                                            <i class="fas fa-calendar-times" style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem; display: block;"></i>
+                                            <p>Aucune demande de congé trouvée</p>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" class="footer-link">À propos</a>
+                <a href="#" class="footer-link">Confidentialité</a>
+                <a href="#" class="footer-link">Conditions d'utilisation</a>
+                <a href="#" class="footer-link">Aide & Support</a>
+                <a href="#" class="footer-link">Contact</a>
+            </div>
+            <div class="footer-social">
+                <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+            <div class="footer-copyright">
+                &copy; <%= java.time.Year.now().getValue() %> Entreprise Congé. Tous droits réservés.
+            </div>
         </div>
-    </body>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Theme toggle functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('themeToggle');
+            const htmlElement = document.documentElement;
+            const toggleIcon = themeToggle.querySelector('i');
+            
+            // Check for saved theme preference or use default
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            htmlElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            
+            // Toggle theme
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                htmlElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+            
+            function updateThemeIcon(theme) {
+                if (theme === 'dark') {
+                    toggleIcon.className = 'fas fa-sun';
+                } else {
+                    toggleIcon.className = 'fas fa-moon';
+                }
+            }
+            
+            // Particules background
+            const container = document.getElementById('particles');
+            container.innerHTML = ''; // Clear existing particles
+            
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 10 + 3;
+                p.style.width = p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.bottom = '-' + size + 'px';
+                p.style.animationDuration = Math.random() * 15 + 10 + 's';
+                p.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(p);
+            }
+            
+            // User menu (placeholder functionality)
+            document.querySelector('.user-menu').addEventListener('click', function() {
+                alert('Menu utilisateur à venir');
+            });
+        });
+    </script>
+</body>
 </html>

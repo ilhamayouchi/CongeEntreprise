@@ -9,6 +9,7 @@ import services.DemandeCongeService;
 import services.EmployeService;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,7 +51,7 @@ public class DemandeCongeController extends HttpServlet {
         }
 
         // Forward to the JSP page
-        req.getRequestDispatcher("/gestion-conges.jsp").forward(req, resp);
+        req.getRequestDispatcher("/users/listeDemande.jsp").forward(req, resp);
     }
 
     @Override
@@ -62,7 +63,12 @@ public class DemandeCongeController extends HttpServlet {
             session.setAttribute("demandeCongeService", new DemandeCongeService());
         }
         
+        if (session.getAttribute("employeService") == null) {
+            session.setAttribute("employeService", new EmployeService());
+        }
+        
         DemandeCongeService demandeService = (DemandeCongeService) session.getAttribute("demandeCongeService");
+        EmployeService employeService = (EmployeService) session.getAttribute("employeService");
 
         String op = req.getParameter("op");
         if (op == null) {
@@ -70,30 +76,68 @@ public class DemandeCongeController extends HttpServlet {
             return;
         }
         
+        // Check if it's an AJAX request
+        boolean isAjax = "XMLHttpRequest".equals(req.getHeader("X-Requested-With"));
+        
         try {
+            boolean success = false;
+            String message = "";
+            
             switch (op) {
                 case "create":
-                    createDemande(req, resp, session, demandeService);
+                    success = createDemande(req, session, demandeService, employeService);
+                    message = success ? "Demande créée avec succès" : "Échec de la création de la demande";
                     break;
                 case "update":
-                    updateDemande(req, resp, session, demandeService);
+                    success = updateDemande(req, session, demandeService, employeService);
+                    message = success ? "Demande mise à jour avec succès" : "Échec de la mise à jour de la demande";
                     break;
                 case "delete":
-                    deleteDemande(req, resp, session, demandeService);
+                    success = deleteDemande(req, session, demandeService);
+                    message = success ? "Demande supprimée avec succès" : "Échec de la suppression de la demande";
                     break;
                 default:
-                    resp.sendRedirect(req.getContextPath() + "/DemandeCongeController");
+                    message = "Opération non reconnue";
             }
+            
+            if (isAjax) {
+                // Send JSON response for AJAX requests
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                PrintWriter out = resp.getWriter();
+                out.print("{\"success\":" + success + ",\"message\":\"" + message + "\"}");
+                out.flush();
+            } else {
+                // Set message in session and redirect for non-AJAX requests
+                if (success) {
+                    session.setAttribute("successMessage", message);
+                } else {
+                    session.setAttribute("errorMessage", message);
+                }
+                resp.sendRedirect(req.getContextPath() + "/DemandeCongeController");
+            }
+            
         } catch (Exception e) {
             // Log the exception for debugging
             e.printStackTrace();
             
-            session.setAttribute("errorMessage", "Erreur: " + (e.getMessage() != null ? e.getMessage() : "Une erreur s'est produite"));
-            resp.sendRedirect(req.getContextPath() + "/DemandeCongeController");
+            if (isAjax) {
+                // Send JSON error response for AJAX requests
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                PrintWriter out = resp.getWriter();
+                out.print("{\"success\":false,\"message\":\"Erreur: " + 
+                         (e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "Une erreur s'est produite") + "\"}");
+                out.flush();
+            } else {
+                // Set error message in session and redirect for non-AJAX requests
+                session.setAttribute("errorMessage", "Erreur: " + (e.getMessage() != null ? e.getMessage() : "Une erreur s'est produite"));
+                resp.sendRedirect(req.getContextPath() + "/DemandeCongeController");
+            }
         }
     }
 
-    private void createDemande(HttpServletRequest req, HttpServletResponse resp, HttpSession session, DemandeCongeService demandeService) 
+    private boolean createDemande(HttpServletRequest req, HttpSession session, DemandeCongeService demandeService, EmployeService employeService) 
             throws Exception {
         try {
             // Get parameters
@@ -107,12 +151,6 @@ public class DemandeCongeController extends HttpServlet {
                 throw new Exception("La date de début doit être avant la date de fin");
             }
             
-            // Get the employee service
-            EmployeService employeService = (EmployeService) session.getAttribute("employeService");
-            if (employeService == null) {
-                throw new Exception("Service employé non disponible");
-            }
-            
             // Get the employee
             Employe employe = employeService.findById(employeId);
             if (employe == null) {
@@ -121,23 +159,16 @@ public class DemandeCongeController extends HttpServlet {
             
             // Create the demand
             DemandeConge demande = new DemandeConge(employeId, dateDebut, dateFin, statut, employe);
-            boolean success = demandeService.creerDemande(demande);
+            return demandeService.creerDemande(demande);
             
-            if (!success) {
-                throw new Exception("Échec de la création de la demande");
-            }
-            
-            session.setAttribute("successMessage", "Demande créée avec succès");
         } catch (NumberFormatException e) {
             throw new Exception("ID d'employé invalide");
         } catch (ParseException e) {
             throw new Exception("Format de date invalide");
         }
-        
-        resp.sendRedirect(req.getContextPath() + "/DemandeCongeController");
     }
 
-    private void updateDemande(HttpServletRequest req, HttpServletResponse resp, HttpSession session, DemandeCongeService demandeService) 
+    private boolean updateDemande(HttpServletRequest req, HttpSession session, DemandeCongeService demandeService, EmployeService employeService) 
             throws Exception {
         try {
             // Get parameters
@@ -146,36 +177,67 @@ public class DemandeCongeController extends HttpServlet {
             Date dateFin = dateFormat.parse(req.getParameter("dateFin"));
             String statut = req.getParameter("statut");
             
-            // Create the ID
-            DemandeCongeId id = new DemandeCongeId(employeId, dateDebut, dateFin);
+            // Get old dates for finding the original record
+            Date oldDateDebut = null;
+            Date oldDateFin = null;
             
-            // Get the demand
-            DemandeConge demande = demandeService.trouverDemandeParId(id);
-            if (demande == null) {
-                throw new Exception("Demande non trouvée");
+            if (req.getParameter("oldDateDebut") != null && !req.getParameter("oldDateDebut").isEmpty()) {
+                oldDateDebut = dateFormat.parse(req.getParameter("oldDateDebut"));
+            } else {
+                oldDateDebut = dateDebut;
             }
             
-            // Update the status
-            demande.setStatut(statut);
-            
-            // Save the changes
-            boolean success = demandeService.modifierDemande(demande);
-            
-            if (!success) {
-                throw new Exception("Échec de la mise à jour de la demande");
+            if (req.getParameter("oldDateFin") != null && !req.getParameter("oldDateFin").isEmpty()) {
+                oldDateFin = dateFormat.parse(req.getParameter("oldDateFin"));
+            } else {
+                oldDateFin = dateFin;
             }
             
-            session.setAttribute("successMessage", "Demande mise à jour avec succès");
+            // Validation des dates
+            if (dateDebut.after(dateFin)) {
+                throw new Exception("La date de début doit être avant la date de fin");
+            }
+            
+            // Get the employee
+            Employe employe = employeService.findById(employeId);
+            if (employe == null) {
+                throw new Exception("Employé non trouvé");
+            }
+            
+            // Create the ID for finding the original record
+            DemandeCongeId oldId = new DemandeCongeId(employeId, oldDateDebut, oldDateFin);
+            
+            // Get the original demand
+            DemandeConge oldDemande = demandeService.trouverDemandeParId(oldId);
+            if (oldDemande == null) {
+                throw new Exception("Demande originale non trouvée");
+            }
+            
+            // If dates have changed, delete the old record and create a new one
+            if (!oldDateDebut.equals(dateDebut) || !oldDateFin.equals(dateFin)) {
+                // Delete the old record
+                boolean deleteSuccess = demandeService.supprimerDemande(oldDemande);
+                if (!deleteSuccess) {
+                    throw new Exception("Échec de la suppression de l'ancienne demande");
+                }
+                
+                // Create a new record
+                DemandeConge newDemande = new DemandeConge(employeId, dateDebut, dateFin, statut, employe);
+                return demandeService.creerDemande(newDemande);
+            } else {
+                // Just update the status
+                oldDemande.setStatut(statut);
+                return demandeService.modifierDemande(oldDemande);
+            }
+            
         } catch (NumberFormatException e) {
             throw new Exception("ID d'employé invalide");
         } catch (ParseException e) {
             throw new Exception("Format de date invalide");
         }
-        
-        resp.sendRedirect(req.getContextPath() + "/DemandeCongeController");
     }
 
-    private void deleteDemande(HttpServletRequest req, HttpServletResponse resp, HttpSession session, DemandeCongeService demandeService) 
+    private boolean deleteDemande(HttpServletRequest req, HttpSession session, DemandeCongeService demandeService) 
             throws Exception {
         try {
             // Get parameters
@@ -202,11 +264,8 @@ public class DemandeCongeController extends HttpServlet {
             boolean success = demandeService.supprimerDemande(demande);
             System.out.println("Delete result: " + success);
             
-            if (!success) {
-                throw new Exception("Échec de la suppression de la demande");
-            }
+            return success;
             
-            session.setAttribute("successMessage", "Demande supprimée avec succès");
         } catch (NumberFormatException e) {
             e.printStackTrace();
             throw new Exception("ID d'employé invalide");
@@ -217,8 +276,5 @@ public class DemandeCongeController extends HttpServlet {
             e.printStackTrace();
             throw new Exception("Erreur lors de la suppression: " + e.getMessage());
         }
-        
-        // Redirect back to the same page
-        resp.sendRedirect(req.getContextPath() + "/DemandeCongeController");
     }
 }
